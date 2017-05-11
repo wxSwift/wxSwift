@@ -1,9 +1,16 @@
 
-#define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
-// Windows 헤더 파일:
-#include <windows.h>
+// MinGW
+// clang++ -std=c++14 wxCHello.cpp -I C:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll/mswu -I C:/Work/wxSwift/wxc/src/include -I C:/Work/wxWidgets-3.0.3/include -L ../../wxc/build/cpp -lwxC -L c:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv -lwxmsw30u_aui -lwxmsw30u_core -lwxmsw30u_gl -lwxmsw30u_html -lwxmsw30u_media -lwxmsw30u_propgrid -lwxmsw30u_ribbon -lwxmsw30u_richtext -lwxmsw30u_stc -lwxmsw30u_webview -lwxmsw30u_xrc -lwxpng -lwxregexu -lwxscintilla -lwxtiff -lwxzlib -o wxCHello.exe
+// clang++ -std=c++14 wxCHello.cpp -I C:/Work/wxWidgets-3.0.3/lib/gcc630_x64_dll/mswu    -I C:/Work/wxSwift/wxc/src/include -I C:/Work/wxWidgets-3.0.3/include -L ../../wxc/build/cpp -lwxC -L C:/Work/wxWidgets-3.0.3/lib/gcc630_x64_dll    -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv -lwxmsw30u_aui -lwxmsw30u_core -lwxmsw30u_gl -lwxmsw30u_html -lwxmsw30u_media -lwxmsw30u_propgrid -lwxmsw30u_ribbon -lwxmsw30u_richtext -lwxmsw30u_stc -lwxmsw30u_webview -lwxmsw30u_xrc -lwxpng -lwxregexu -lwxscintilla -lwxtiff -lwxzlib -o wxCHello.exe
+
+#include <stdio.h>
 
 #include "wxc_swift.h"
+#ifdef __MINGW32__
+int wxEVT_COMMAND_MENU_SELECTED = 10117;
+#else
+int wxEVT_COMMAND_MENU_SELECTED = 10017;
+#endif
 
 enum
 {
@@ -12,13 +19,17 @@ enum
 
 void *frame;
 
-void MyFrame_OnExit(void *, void *, void *) //  wxCommandEvent& WXUNUSED(event))
+void MyFrame_OnExit(void *, void *, void *event) //  wxCommandEvent& WXUNUSED(event))
 {
+  if (!event)
+    return;
 	wxWindow_Close(frame, true);
 }
 
-void MyFrame_About(void *, void *, void *)
+void MyFrame_About(void *, void *, void *event)
 {
+  if (!event)
+    return;
 	void *msgdlg = wxMessageDialog_Create(frame, wxString_CreateUTF8("This is a wxWidgets' Hello world sample"),
 										  wxString_CreateUTF8("About Hello World"),
 										  0x00000004/*wxOK*/ | 0x00000800/*wxICON_INFORMATION*/);
@@ -26,8 +37,10 @@ void MyFrame_About(void *, void *, void *)
 	wxMessageDialog_Delete(msgdlg);
 }
 
-void MyFrame_Hello(void *, void *, void *)
+void MyFrame_Hello(void *, void *, void *event)
 {
+  if (!event)
+    return;
 	void *msgdlg = wxMessageDialog_Create(frame, wxString_CreateUTF8("Hello world from wxWidgets!"), wxString_CreateUTF8(""),
 										  0x00000004/*wxOK*/ | 0x00000800/*wxICON_INFORMATION*/);
 	wxMessageDialog_ShowModal(msgdlg);
@@ -60,14 +73,34 @@ void MyApp_OnInit(void* _fun, void* _data, void* _evt)
 	void *status_txt = wxString_CreateUTF8("Welcome to wxWidgets!");
 	wxFrame_SetStatusText(frame, status_txt, 0);
 
-	//void *ev_h = wxEvtHandler_Create();
-	int wxEVT_COMMAND_MENU_SELECTED = 10017;
-	wxEvtHandler_Connect(frame, 5006/*wxID_EXIT*/, 5006/*wxID_EXIT*/, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create(MyFrame_OnExit, 0));
-	wxEvtHandler_Connect(frame, 5014/*wxID_ABOUT*/, 5014/*wxID_ABOUT*/, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create(MyFrame_About, 0));
-	wxEvtHandler_Connect(frame, ID_Hello, ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create(MyFrame_Hello, 0));
-
+	wxEvtHandler_Connect(frame, 5006/*wxID_EXIT*/, 5006/*wxID_EXIT*/, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_OnExit, 0));
+	wxEvtHandler_Connect(frame, 5014/*wxID_ABOUT*/, 5014/*wxID_ABOUT*/, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_About, 0));
+	int ret = wxEvtHandler_Connect(frame, ID_Hello, ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_Hello, 0));
+    printf("ret=%d, setting=%d\n", ret, wxEVT_COMMAND_MENU_SELECTED);
+  
 	wxWindow_Show(frame);
 }
+
+
+#if __MINGW32__
+
+int main(int, char **)
+{
+	ELJApp_InitializeC(wxClosure_Create((void *)MyApp_OnInit, NULL), 0, NULL);
+	return 0;
+}
+
+#include <string.h>
+extern "C" wchar_t *__imp__Z13wxCRT_StrdupWPKw(const wchar_t *pwz)
+{
+	return _wcsdup(pwz);
+}
+
+#else
+
+#define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용은 Windows 헤더에서 제외합니다.
+// Windows 헤더 파일:
+#include <windows.h>
 
 int CALLBACK WinMain(
 	HINSTANCE hInstance,
@@ -76,6 +109,8 @@ int CALLBACK WinMain(
 	int       nCmdShow
 )
 {
-	ELJApp_InitializeC(wxClosure_Create(MyApp_OnInit, NULL), 0, NULL);
+	ELJApp_InitializeC(wxClosure_Create((void *)MyApp_OnInit, NULL), 0, NULL);
 	return 0;
 };
+
+#endif
