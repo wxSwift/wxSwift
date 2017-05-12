@@ -7,10 +7,10 @@ frame.show(true)
 app.mainLoop()
 */
 /*
-import wxCore
+import wxC
 
-let frame = frameCreate(nil, ID_ANY, "Hello World")
-frameShow(frame)
+let frame = wxFrame_Create(nil, ID_ANY, "Hello World")
+wxWindow_Show(frame)
 mainLoop()
 */
 
@@ -24,7 +24,7 @@ Run
   wxCTest 
 */
 
-import CwxC
+import wxC
 
 // void MyApp_OnInit(void* _fun, void* _data, void* _evt)
 

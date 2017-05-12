@@ -1,16 +1,20 @@
 
 // MinGW
-// clang++ -std=c++14 wxCHello.cpp -I C:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll/mswu -I C:/Work/wxSwift/wxc/src/include -I C:/Work/wxWidgets-3.0.3/include -L ../../wxc/build/cpp -lwxC -L c:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv -lwxmsw30u_aui -lwxmsw30u_core -lwxmsw30u_gl -lwxmsw30u_html -lwxmsw30u_media -lwxmsw30u_propgrid -lwxmsw30u_ribbon -lwxmsw30u_richtext -lwxmsw30u_stc -lwxmsw30u_webview -lwxmsw30u_xrc -lwxpng -lwxregexu -lwxscintilla -lwxtiff -lwxzlib -o wxCHello.exe
-// clang++ -std=c++14 wxCHello.cpp -I C:/Work/wxWidgets-3.0.3/lib/gcc630_x64_dll/mswu    -I C:/Work/wxSwift/wxc/src/include -I C:/Work/wxWidgets-3.0.3/include -L ../../wxc/build/cpp -lwxC -L C:/Work/wxWidgets-3.0.3/lib/gcc630_x64_dll    -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv -lwxmsw30u_aui -lwxmsw30u_core -lwxmsw30u_gl -lwxmsw30u_html -lwxmsw30u_media -lwxmsw30u_propgrid -lwxmsw30u_ribbon -lwxmsw30u_richtext -lwxmsw30u_stc -lwxmsw30u_webview -lwxmsw30u_xrc -lwxpng -lwxregexu -lwxscintilla -lwxtiff -lwxzlib -o wxCHello.exe
+// clang++ -std=c++14 wxCHello.cpp -I C:/Work/wxSwift/wxc/src/include -L ../../wxc/build/cpp -lwxC -L c:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv -lwxmsw30u_aui -lwxmsw30u_core -lwxmsw30u_gl -lwxmsw30u_html -lwxmsw30u_media -lwxmsw30u_propgrid -lwxmsw30u_ribbon -lwxmsw30u_richtext -lwxmsw30u_stc -lwxmsw30u_webview -lwxmsw30u_xrc -lwxpng -lwxregexu -lwxscintilla -lwxtiff -lwxzlib -o wxCHello.exe
+// clang++ -std=c++14 wxCHello.cpp -I C:/Work/wxSwift/wxc/src/include -L ../../wxc/build/cpp -lwxC -L C:/Work/wxWidgets-3.0.3/lib/gcc630_x64_dll    -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv -lwxmsw30u_aui -lwxmsw30u_core -lwxmsw30u_gl -lwxmsw30u_html -lwxmsw30u_media -lwxmsw30u_propgrid -lwxmsw30u_ribbon -lwxmsw30u_richtext -lwxmsw30u_stc -lwxmsw30u_webview -lwxmsw30u_xrc -lwxpng -lwxregexu -lwxscintilla -lwxtiff -lwxzlib -o wxCHello.exe
 
-#include <stdio.h>
+// wxc.h needs stdint.h and time.h
+#include <stdint.h>
+#include <time.h>
+extern "C" {
+#include "wxc.h"
+}
 
-#include "wxc_swift.h"
-#ifdef __MINGW32__
-int wxEVT_COMMAND_MENU_SELECTED = 10117;
-#else
-int wxEVT_COMMAND_MENU_SELECTED = 10017;
-#endif
+const int wxEVT_COMMAND_MENU_SELECTED = expEVT_COMMAND_MENU_SELECTED();
+const int wxDEFAULT_FRAME_STYLE = 541072960;
+const int wxID_ANY = -1;
+const int wxID_EXIT = 5006;
+const int wxID_ABOUT = 5014;
 
 enum
 {
@@ -58,10 +62,10 @@ void MyApp_OnInit(void* _fun, void* _data, void* _evt)
 	wxMenu_Append(menuFile, ID_Hello, wxString_CreateUTF8("&Hello...\tCtrl-H"),
 				  wxString_CreateUTF8("Help string shown in status bar for this menu item"), 0/*wxITEM_NORMAL*/);
 	wxMenu_AppendSeparator(menuFile);
-	wxMenu_Append(menuFile, 5006/*wxID_EXIT*/, empty_str, empty_str, 0/*wxITEM_NORMAL*/);
+	wxMenu_Append(menuFile, wxID_EXIT, empty_str, empty_str, 0/*wxITEM_NORMAL*/);
 
 	void *menuHelp = wxMenu_Create(empty_str, 0);
-	wxMenu_Append(menuHelp, 5014/*wxID_ABOUT*/, empty_str, empty_str, 0/*wxITEM_NORMAL*/);
+	wxMenu_Append(menuHelp, wxID_ABOUT, empty_str, empty_str, 0/*wxITEM_NORMAL*/);
 
 	void *menu_bar = wxMenuBar_Create(0);
 	wxMenuBar_Append(menu_bar, menuFile, wxString_CreateUTF8("&File"));
@@ -73,10 +77,9 @@ void MyApp_OnInit(void* _fun, void* _data, void* _evt)
 	void *status_txt = wxString_CreateUTF8("Welcome to wxWidgets!");
 	wxFrame_SetStatusText(frame, status_txt, 0);
 
-	wxEvtHandler_Connect(frame, 5006/*wxID_EXIT*/, 5006/*wxID_EXIT*/, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_OnExit, 0));
-	wxEvtHandler_Connect(frame, 5014/*wxID_ABOUT*/, 5014/*wxID_ABOUT*/, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_About, 0));
-	int ret = wxEvtHandler_Connect(frame, ID_Hello, ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_Hello, 0));
-    printf("ret=%d, setting=%d\n", ret, wxEVT_COMMAND_MENU_SELECTED);
+	wxEvtHandler_Connect(frame, wxID_EXIT, wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_OnExit, 0));
+	wxEvtHandler_Connect(frame, wxID_ABOUT, wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_About, 0));
+	wxEvtHandler_Connect(frame, ID_Hello, ID_Hello, wxEVT_COMMAND_MENU_SELECTED, wxClosure_Create((void *)MyFrame_Hello, 0));
   
 	wxWindow_Show(frame);
 }
