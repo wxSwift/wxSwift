@@ -10,7 +10,7 @@
   #include <windows.h>
   #define EWXWEXPORT(TYPE,FUNC_NAME) TYPE __export __cdecl FUNC_NAME
 #else
-  #ifdef _WIN32
+  #if defined(_WIN32) && !defined(STATIC_WXC)
     #define EWXWEXPORT(TYPE,FUNC_NAME) __declspec(dllexport) TYPE __cdecl FUNC_NAME
     #undef EXPORT
     #define EXPORT extern "C" __declspec(dllexport) 
