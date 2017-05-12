@@ -19,8 +19,8 @@ SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 
 include_directories(
     "C:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll/mswu"
-     ${PROJECT_SOURCE_DIR}/include
     "C:/Work/wxWidgets-3.0.3/include"
+     ${PROJECT_SOURCE_DIR}/include
     )
 
 # Set Output Directory
