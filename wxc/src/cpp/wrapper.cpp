@@ -762,4 +762,9 @@ EWXWEXPORT(int,wxEvent_NewEventType)()
 {
         return (int)wxNewEventType();
 }
+
+EWXWEXPORT(bool, wx_Initialize)(int argc, wxChar **argv)
+{
+	return wxInitialize(argc, argv);
+}
 }

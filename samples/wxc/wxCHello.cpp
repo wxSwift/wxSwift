@@ -89,7 +89,12 @@ void MyApp_OnInit(void* _fun, void* _data, void* _evt)
 
 int main(int, char **)
 {
-	ELJApp_InitializeC(wxClosure_Create((void *)MyApp_OnInit, NULL), 0, NULL);
+  wx_Initialize(0, (wchar_t**)NULL);
+  ELJApp_SetExitOnFrameDelete(true);
+
+  MyApp_OnInit(NULL, NULL, NULL);
+
+  ELJApp_MainLoop();
 	return 0;
 }
 

@@ -552,6 +552,8 @@ void       ELJApp_MilliSleep( int _mscs );
 int        ELJApp_Yield(  );
 TBoolInt   ELJApp_IsTerminating(  );
 
+/* Only Initialize, do not OnInit() and MainLoop() */
+TBool      wx_Initialize( int argc, wchar_t **argv );
 
 /* ELJArtProv */
 TClassDefExtend(ELJArtProv,wxArtProvider)
