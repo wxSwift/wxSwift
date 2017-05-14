@@ -1,10 +1,14 @@
 #ifndef __EWXW_DEF_H
 #define __EWXW_DEF_H
 
+#ifndef CALLINGCONV
+#define CALLINGCONV
+#endif
+
 #ifdef EXPORT
 #undef EXPORT
 #endif
-#define EXPORT extern "C"
+#define EXPORT extern "C" CALLINGCONV
 
 #ifdef __WATCOMC__
   #include <windows.h>
@@ -13,9 +17,9 @@
   #if defined(_WIN32) && !defined(STATIC_WXC)
     #define EWXWEXPORT(TYPE,FUNC_NAME) __declspec(dllexport) TYPE __cdecl FUNC_NAME
     #undef EXPORT
-    #define EXPORT extern "C" __declspec(dllexport) 
+    #define EXPORT extern "C" __declspec(dllexport)
   #else
-    #define EWXWEXPORT(TYPE,FUNC_NAME) TYPE FUNC_NAME
+    #define EWXWEXPORT(TYPE,FUNC_NAME) TYPE CALLINGCONV FUNC_NAME
   #endif
   #ifndef _cdecl
     #define _cdecl

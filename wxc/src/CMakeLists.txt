@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8.12)
 
 SET(CMAKE_C_COMPILER clang)
 SET(CMAKE_CXX_COMPILER clang++)
-SET(COMMON_FLAGS "-std=c++14 -DWXUSINGDLL -DSTATIC_WXC -O2 -Wno-ignored-attributes -Wno-macro-redefined -D__GXX_ABI_VERSION=1008")
+#SET(COMMON_FLAGS "-std=c++14 -DWXUSINGDLL -DSTATIC_WXC -O2 -Wno-ignored-attributes -Wno-macro-redefined -D__GXX_ABI_VERSION=1008")
+SET(COMMON_FLAGS "-std=c++14 -DWXUSINGDLL -DSTATIC_WXC -DCALLINGCONV=__attribute__((swiftcall)) -O2 -Wno-ignored-attributes -Wno-macro-redefined -D__GXX_ABI_VERSION=1008")
 
 # For G++
 #SET(CMAKE_C_COMPILER gcc)
