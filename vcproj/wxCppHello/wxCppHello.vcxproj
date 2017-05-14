@@ -150,14 +150,14 @@
     <ClInclude Include="wxCppHello.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="wxCppHello.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="wxCppHello.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico" />
     <Image Include="wxCppHello.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\samples\wxcpp\wxCppHello.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
