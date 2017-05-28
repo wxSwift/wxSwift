@@ -143,6 +143,14 @@ TStringLen       wxString_GetString( TSelf(wxString) s, TStringOut buffer );
 
 size_t           wxString_Length( TSelf(wxString) s );
 
+TClass(wxCharBuffer) wxString_GetUtf8( TSelf(wxString) s);
+
+
+/* wxCharBuffer */
+
+char* wxCharBuffer_DataUtf8( TSelf(wxCharBuffer) cb);
+
+void wxCharBuffer_Delete( TSelf(wxCharBuffer) cb);
 
 
 /* menu */

@@ -553,7 +553,11 @@ int        ELJApp_Yield(  );
 TBoolInt   ELJApp_IsTerminating(  );
 
 /* Only Initialize, do not OnInit() and MainLoop() */
-TBool      wx_Initialize( int argc, wchar_t **argv );
+TBool      wxc_Initialize( int argc, wchar_t **argv );
+
+TBool      wxc_LaunchDefaultBrowser(TClass(wxString) url, int flags);
+TClass(wxString) wxc_ExecuteOutErr(TClass(wxString) _cmd);
+TBool      wxc_FileExists(TClass(wxString) filename);
 
 /* ELJArtProv */
 TClassDefExtend(ELJArtProv,wxArtProvider)
