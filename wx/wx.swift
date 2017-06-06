@@ -38,7 +38,7 @@ open class EvtHandler : Object {
     super.init()
   }
   
-  public func Bind(_ type: Int32, _ handler: @escaping BindCallback, _ wnd: Window) {
+  public func bind(_ type: Int32, _ handler: @escaping BindCallback, _ wnd: Window) {
     let closure_fun : ClosureFun = {
       (a : VoidPtr, b : VoidPtr, evt : VoidPtr) -> Void in
 
@@ -58,8 +58,8 @@ open class EvtHandler : Object {
     _ = _wxc_EvtHandler_Connect(_obj, -1, -1, type, _wxc_Closure_Create(closure_fun, bridgeRetained(obj:data)))
   }
 
-  public func Bind(_ type: Int32, _ handler: @escaping BindCallback) {
-    Bind(type, handler, self as! Window)
+  public func bind(_ type: Int32, _ handler: @escaping BindCallback) {
+    bind(type, handler, self as! Window)
   }
 }
 
@@ -69,7 +69,7 @@ public class App : EvtHandler {
     _wxc_ELJApp_SetExitOnFrameDelete(1);
   }
 
-  public func MainLoop() {
+  public func mainLoop() {
     _ = _wxc_ELJApp_MainLoop()
   }
   
@@ -81,27 +81,27 @@ open class Window : EvtHandler {
     super.init()
   }
   
-  public func Show() {
+  public func show() {
     _ = _wxc_Window_Show(_obj)
   }
   
-  public func SetFont(_ font: Font) {
+  public func setFont(_ font: Font) {
     _ = _wxc_Window_SetFont(_obj, font._font)
   }
   
-  public func SetForegroundColour(_ colour: Colour) {
+  public func setForegroundColour(_ colour: Colour) {
     _ = _wxc_Window_SetForegroundColour(_obj, colour._colour)
   }
 
-  public func SetBackgroundColour(_ colour: Colour) {
+  public func setBackgroundColour(_ colour: Colour) {
     _ = _wxc_Window_SetBackgroundColour(_obj, colour._colour)
   }
 
-  public func SetWindowStyle(_ style: Int32) {
-    SetWindowStyleFlag(style)
+  public func setWindowStyle(_ style: Int32) {
+    setWindowStyleFlag(style)
   }
 
-  public func SetWindowStyleFlag(_ style: Int32) {
+  public func setWindowStyleFlag(_ style: Int32) {
     _wxc_Window_SetWindowStyleFlag(_obj, style)
   }
 }
@@ -111,7 +111,7 @@ public class TopLevelWindow : Window {
     super.init()
   }
 
-  public func SetIcon(_ icon: Icon) {
+  public func setIcon(_ icon: Icon) {
     _wxc_TopLevelWindow_SetIcon(_obj, icon._icon)
   }
 }
@@ -136,10 +136,10 @@ public class TextCtrl : Window {
     _obj = _wxc_TextCtrl_Create(parent?._obj, id, _wxc_String_CreateUTF8(label), pos.x, pos.y, size.width, size.height, style)
   }
 
-  public func Clear() {
+  public func clear() {
     _wxc_TextCtrl_Clear(_obj)
   }
-  public func AppendText(_ text: String) {
+  public func appendText(_ text: String) {
     _wxc_TextCtrl_AppendText(_obj, _wxc_String_CreateUTF8(text))
   }
 }
@@ -150,7 +150,7 @@ open class Button : Window {
     _obj = _wxc_Button_Create(parent?._obj, id, _wxc_String_CreateUTF8(label), pos.x, pos.y, size.width, size.height, style)
   }
 
-  public override func SetBackgroundColour(_ colour: Colour) {
+  public override func setBackgroundColour(_ colour: Colour) {
     _ = _wxc_Button_SetBackgroundColour(_obj, colour._colour)
   }
 }
@@ -175,7 +175,7 @@ public class StaticBox : Window {
 }
 
 public class Dialog : Window {
-  public func ShowModal() -> Int32 {
+  public func showModal() -> Int32 {
     return _wxc_Dialog_ShowModal(_obj)
   }
 }
@@ -186,7 +186,7 @@ public class MessageDialog : Dialog {
     _obj = _wxc_MessageDialog_Create(parent._obj, _wxc_String_CreateUTF8(message), _wxc_String_CreateUTF8(caption), style)
   }
 
-  public override func ShowModal() -> Int32 {
+  public override func showModal() -> Int32 {
     return _wxc_MessageDialog_ShowModal(_obj)
   }
 }
@@ -197,7 +197,7 @@ public class FileDialog : Dialog {
     _obj = _wxc_FileDialog_Create(parent._obj, _wxc_String_CreateUTF8(message), _wxc_String_CreateUTF8(defaultDir), _wxc_String_CreateUTF8(defaultFile), _wxc_String_CreateUTF8(wildcard), -1, -1, style)
   }
 
-  public func GetPath() -> String {
+  public func getPath() -> String {
     let wx_string = _wxc_FileDialog_GetPath(_obj)
     let utf8_char_buf = _wxc_wxString_GetUtf8(wx_string)
     let ret = String(cString: _wxc_wxCharBuffer_DataUtf8(utf8_char_buf))
@@ -240,15 +240,15 @@ public class Icon : Object {
     _icon = _wxc_Icon_CreateLoad(_wxc_String_CreateUTF8(name), BITMAP_TYPE_ICO, -1, -1)
   }
   
-  public func GetHeight() -> Int {
+  public func getHeight() -> Int {
     return Int(_wxc_Icon_GetHeight(_icon))
   }
   
-  public func GetWidth() -> Int {
+  public func getWidth() -> Int {
     return Int(_wxc_Icon_GetWidth(_icon))
   }
   
-  public func IsOk() -> Bool {
+  public func isOk() -> Bool {
     return _wxc_Icon_IsOk(_icon) != 0
   }
 }
@@ -277,16 +277,16 @@ public class Event : Object {
   }
 }
 
-public func LaunchDefaultBrowser(_ url: String) -> Bool {
+public func launchDefaultBrowser(_ url: String) -> Bool {
   let ret = _wxc_LaunchDefaultBrowser(_wxc_String_CreateUTF8(url), 0)
   return ret == 1
 }
 
-public func Execute(_ command: String, _ flags: Int32, _ callback: VoidPtr) -> Int {
+public func execute(_ command: String, _ flags: Int32, _ callback: VoidPtr) -> Int {
   return Int(_wxc_ELJApp_ExecuteProcess(_wxc_String_CreateUTF8(command), flags, callback))
 }
 
-public func ExecuteOutErr(_ command: String) -> String {
+public func executeOutErr(_ command: String) -> String {
   let wx_string = _wxc_ExecuteOutErr(_wxc_String_CreateUTF8(command));
   let utf8_char_buf = _wxc_wxString_GetUtf8(wx_string)
   let ret = String(cString: _wxc_wxCharBuffer_DataUtf8(utf8_char_buf))
@@ -294,7 +294,7 @@ public func ExecuteOutErr(_ command: String) -> String {
   return ret
 }
 
-public func FileExists(_ filename: String) -> Bool {
+public func fileExists(_ filename: String) -> Bool {
   let ret = _wxc_FileExists(_wxc_String_CreateUTF8(filename))
   return ret == 1
 }

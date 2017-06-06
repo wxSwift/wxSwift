@@ -1,16 +1,94 @@
+// Copyright (c) 2017 Han Sangjin
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See https://swift.org/LICENSE.txt for license information
+
+// This is a sample program using wxSwift and provides a simple user interface.
+// Compile: 
+//   windres --preprocessor=mcpp -i Application.rc -o Application.obj
+//   swiftc.exe SwiftForWindows.swift -o SwiftForWindows.exe -Xlinker
+//              --subsystem -Xlinker windows -Xlinker Application.obj
+//   strip SwiftForWindows.exe
+
+import MinGWCrt
 import wx
+
+//////////////////////////////
+// Compile and Link Options
+//////////////////////////////
+
+var link_with_subsystem_windows = false
+var run_in_new_window = true
+
+
+///////////////////////
+// Utility Functions
+///////////////////////
+
+// If we can use Foundation module, this function will be changed or removed.
+func GetSlashPositionFromLast(_ arg : String) -> Int {
+  var slash_len = 0;
+
+  if let offset = strrchr(arg, 0x5C) {  // "\\"
+    slash_len = Int(strlen(offset))
+  }
+
+  if let offset = strrchr(arg, 0x2F) {  // "/"
+    let length = Int(strlen(offset))
+    if (length < slash_len) {
+      slash_len = length
+    }
+  }
+
+  if (slash_len == 0) {
+    return 0
+  }
+  return arg.characters.count - slash_len
+}
+
+func getcwd() -> String {
+
+    let cwd = MinGWCrt.getcwd(nil, _MAX_PATH)
+    if cwd == nil {
+      return ""
+    }
+    defer { free(cwd) }
+    if let path = String(validatingUTF8: cwd!) {
+      return path
+    }
+    
+    return ""
+}
 
 ///////////////////////
 // Common Variables
 ///////////////////////
 
+// Find out the located directory of this program
+let arg = CommandLine.arguments[0]
+let slash_pos = GetSlashPositionFromLast(arg)
+var default_prefix = String(arg.characters.prefix(slash_pos))
+
+// make default_prefix be the absolute path
+if (slash_pos == 0) {
+  default_prefix = getcwd()
+} else {
+  let index_1 = default_prefix.index(default_prefix.startIndex, offsetBy: 1)
+  if (String(default_prefix[index_1]) != ":" ) {
+    default_prefix = getcwd() + "\\" + default_prefix
+  }
+}
+
 var swift_source : String = ""
 var swift_out_exe : String = ""
-var init_swift_compiler_exe : String = "C:\\SwiftForWindows\\Swift\\bin\\swiftc.exe"
+var init_swift_compiler_exe : String = default_prefix + "\\Swift\\bin\\swiftc.exe"
+var swift_src_dir : String = default_prefix + "\\My Programs"
 var swift_compiler_exe : String = init_swift_compiler_exe
-var swift_logo_ico : String = "Swift_logo.svg.png.ico"
-var run_in_new_window = true
-
+var swift_logo_ico : String = "swift_logo"
+  
+if !wx.fileExists(swift_compiler_exe) {
+  swift_compiler_exe = "Compiler is not found. Double click here."
+}
 
 //////////////////////////////
 // Define Text Style Button
@@ -21,18 +99,18 @@ class TextButton : wx.Button {
     super.init(parent, id:id, label:label, pos:pos, size:size, style:wx.BORDER_NONE, 
       validator:wx.DefaultValidator, name:"noname")
 
-      SetFont(wx.Font(8, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
-      SetBackgroundColour(wx.Colour(0xFFFFFF))
-      SetForegroundColour(wx.Colour(0xFFFF9933))
+      setFont(wx.Font(8, wx.DECORATIVE, wx.NORMAL, wx.NORMAL))
+      setBackgroundColour(wx.Colour(0xFFFFFF))
+      setForegroundColour(wx.Colour(0xFFFF9933))
       
-      Bind(wx.EVT_ENTER_WINDOW, { _ in
-        self.SetBackgroundColour(wx.NullColour)
-        self.SetWindowStyle(wx.BORDER_DEFAULT)
+      bind(wx.EVT_ENTER_WINDOW, { _ in
+        self.setBackgroundColour(wx.NullColour)
+        self.setWindowStyle(wx.BORDER_DEFAULT)
       })
       
-      Bind(wx.EVT_LEAVE_WINDOW, { _ in
-        self.SetBackgroundColour(wx.Colour(0xFFFFFF))
-        self.SetWindowStyle(wx.BORDER_NONE)
+      bind(wx.EVT_LEAVE_WINDOW, { _ in
+        self.setBackgroundColour(wx.Colour(0xFFFFFF))
+        self.setWindowStyle(wx.BORDER_NONE)
       })
   }
 }
@@ -45,13 +123,11 @@ var app = wx.App()
 
 var frame = wx.Frame(nil, wx.ID_ANY, "Swift for Windows 1.6", size: wx.Size(1000, 600), style: wx.DEFAULT_FRAME_STYLE & ~wx.RESIZE_BORDER )
 
-if wx.FileExists(swift_logo_ico) {
-  let icon = wx.Icon(swift_logo_ico)
-  frame.SetIcon(icon)
-}
+let icon = wx.Icon(swift_logo_ico, BITMAP_TYPE_ICO_RESOURCE, wx.Size(-1, -1))
+frame.setIcon(icon)
 
 var panel = wx.Panel(frame)
-panel.SetBackgroundColour(wx.Colour(0xFFFFFF))
+panel.setBackgroundColour(wx.Colour(0xFFFFFF))
 
 var font_log = wx.Font(9, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.NORMAL)
 var font_12 = wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
@@ -66,25 +142,25 @@ var font_27 = wx.Font(21, wx.DECORATIVE, wx.NORMAL, wx.NORMAL)
 ///////////////////////
 
 var compiler_box = wx.StaticBox(panel, wx.ID_ANY, "Compiler", pos: wx.Point(10, 5), size: wx.Size(965, 138))
-compiler_box.SetFont(font_19B)
+compiler_box.setFont(font_19B)
 
 var selected_file = wx.TextCtrl(compiler_box, wx.ID_ANY, "Select swift file to compile or run", pos:Point(20,37), size:Size(700,35), style:wx.TE_READONLY)
-selected_file.SetFont(font_21)
-selected_file.SetBackgroundColour(wx.Colour(0xFFFFFF))
+selected_file.setFont(font_21)
+selected_file.setBackgroundColour(wx.Colour(0xFFFFFF))
 
 var select_file_btn = wx.Button(compiler_box, id: wx.ID_ANY, label: "Select File", pos: wx.Point(725,37), 
        size: wx.Size(220,35), style:0, validator:wx.DefaultValidator, name:"buttonSelectFile")
-select_file_btn.SetFont(font_19B)       
+select_file_btn.setFont(font_19B)       
 
 var compile_button = wx.Button(compiler_box, id: wx.ID_ANY, label: "Compile", pos: Point(20,85),
        size: wx.Size(460,40), style:0, validator:wx.DefaultValidator,
        name:"buttonCompile")
-compile_button.SetFont(font_27)       
+compile_button.setFont(font_27)       
 
 var run_button = wx.Button(compiler_box, id:wx.ID_ANY, label:"Run", pos:Point(485,85),
        size:wx.Size(460,40), style:0, validator:wx.DefaultValidator,
        name:"buttonRun")
-run_button.SetFont(font_27)       
+run_button.setFont(font_27)       
 
 
 ///////////////////////
@@ -92,20 +168,20 @@ run_button.SetFont(font_27)
 ///////////////////////
 
 var settings_box = wx.StaticBox(panel, wx.ID_ANY, "Compiler Settings", pos:Point(10, 150), size:Size(965, 107))
-settings_box.SetFont(font_19B)
+settings_box.setFont(font_19B)
 
 var label1_static = wx.StaticText(settings_box, wx.ID_ANY, "* double click on text field to change settings values", pos:Point(15,40), size:Size(600,35))
-label1_static.SetFont(font_12)
+label1_static.setFont(font_12)
 
 var reset_button = TextButton(settings_box, id:wx.ID_ANY, label:"Reset settings", pos:Point(850,35),
        size:wx.Size(100,22))
 
 var label2_static = wx.StaticText(settings_box, wx.ID_ANY, "Swift Compiler", pos:Point(15,65), size:Size(200,35))
-label2_static.SetFont(font_19B)
+label2_static.setFont(font_19B)
 
 var compiler_textctrl = wx.TextCtrl(settings_box, wx.ID_ANY, swift_compiler_exe, pos:Point(185,65), size:Size(762,30), style:wx.TE_READONLY)
-compiler_textctrl.SetFont(font_19)
-compiler_textctrl.SetBackgroundColour(wx.Colour(0xFFFFFF))
+compiler_textctrl.setFont(font_19)
+compiler_textctrl.setBackgroundColour(wx.Colour(0xFFFFFF))
 
 
 ///////////////////////
@@ -113,12 +189,12 @@ compiler_textctrl.SetBackgroundColour(wx.Colour(0xFFFFFF))
 ///////////////////////
 
 var logs_box = wx.StaticBox(panel, wx.ID_ANY, "Logs", pos:Point(10, 267), size:Size(965, 257))
-logs_box.SetFont(font_19B)
+logs_box.setFont(font_19B)
 
 var log_textctrl = wx.TextCtrl(logs_box, wx.ID_ANY, "",
         pos:Point(5,22), size:Size(955,230), style:wx.BORDER_NONE|wx.TE_READONLY|wx.TE_MULTILINE)
-log_textctrl.SetFont(font_log)
-log_textctrl.SetBackgroundColour(wx.Colour(0xFFFFFF))
+log_textctrl.setFont(font_log)
+log_textctrl.setBackgroundColour(wx.Colour(0xFFFFFF))
 
 
 ///////////////////////
@@ -134,79 +210,88 @@ var help_button = TextButton(panel, id:wx.ID_ANY, label:"Help", pos:Point(475,53
 var project_button = TextButton(panel, id:wx.ID_ANY, label:"Project Website", pos:Point(875,535),
        size:wx.Size(100,22))
 
+
 ///////////////////////
 // Callbacks
 ///////////////////////
 
-func OnSelectFile(_ event: Event) {
-  let openFileDialog = wx.FileDialog(panel, "Select a source code file...", "C:\\SwiftForWindows\\My Programs", "",
+func onSelectFile(_ event: Event) {
+  let openFileDialog = wx.FileDialog(panel, "Select a source code file...", swift_src_dir, "",
                                        "Swift files (*.swift)|*.swift", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-  if (openFileDialog.ShowModal() == wx.ID_CANCEL) {
+  if (openFileDialog.showModal() == wx.ID_CANCEL) {
     return
   }
-  swift_source = openFileDialog.GetPath()
-  selected_file.Clear()
-  selected_file.AppendText(swift_source)
+  swift_source = openFileDialog.getPath()
+  selected_file.clear()
+  selected_file.appendText(swift_source)
 }
 
-func OnProjectLatestNews(_ event: Event) {
-  _ = wx.LaunchDefaultBrowser("https://swiftforwindows.codeplex.com/wikipage?title=News")
+func onProjectLatestNews(_ event: Event) {
+  _ = wx.launchDefaultBrowser("https://swiftforwindows.codeplex.com/wikipage?title=News")
 }
 
-func OnHelp(_ event: Event) {
-  _ = wx.LaunchDefaultBrowser("https://swiftforwindows.codeplex.com/wikipage?title=Help")
+func onHelp(_ event: Event) {
+  _ = wx.launchDefaultBrowser("https://swiftforwindows.codeplex.com/wikipage?title=Help")
 }
 
-func OnProjectWebsite(_ event: Event) {
-  _ = wx.LaunchDefaultBrowser("https://swiftforwindows.codeplex.com/")
+func onProjectWebsite(_ event: Event) {
+  _ = wx.launchDefaultBrowser("https://swiftforwindows.codeplex.com/")
 }
 
-func OnEnterLinkButton(_ event: Event) {
+func onEnterLinkButton(_ event: Event) {
   if let evtobj = event.EventObject as? Window {
-    evtobj.SetBackgroundColour(wx.NullColour)
-    evtobj.SetWindowStyle(wx.BORDER_DEFAULT)
+    evtobj.setBackgroundColour(wx.NullColour)
+    evtobj.setWindowStyle(wx.BORDER_DEFAULT)
   }
 }
 
-func OnLeaveLinkButton(_ event: Event) {
+func onLeaveLinkButton(_ event: Event) {
   if let evtobj = event.EventObject as? Window {
-    evtobj.SetBackgroundColour(wx.Colour(0xFFFFFF))
-    evtobj.SetWindowStyle(wx.BORDER_NONE)
+    evtobj.setBackgroundColour(wx.Colour(0xFFFFFF))
+    evtobj.setWindowStyle(wx.BORDER_NONE)
   }
 }
   
-func OnReset(_ event: Event) {
+func onReset(_ event: Event) {
   swift_compiler_exe = init_swift_compiler_exe
-  compiler_textctrl.Clear()
-  compiler_textctrl.AppendText(swift_compiler_exe)
+  compiler_textctrl.clear()
+  compiler_textctrl.appendText(swift_compiler_exe)
 }
   
-func OnCompilerSettingDblClick(_ event: Event) {
+func onCompilerSettingDblClick(_ event: Event) {
   if let evtobj = event.EventObject as? TextCtrl {
     let openFileDialog = wx.FileDialog(panel, "Select swiftc.exe file", swift_compiler_exe, "",
                                        "swiftc.exe (swiftc.exe)|swiftc.exe", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-    if (openFileDialog.ShowModal() == wx.ID_CANCEL) {
+    if (openFileDialog.showModal() == wx.ID_CANCEL) {
       return
     }
-    swift_compiler_exe = openFileDialog.GetPath()
-    evtobj.Clear()
-    evtobj.AppendText(swift_compiler_exe)
+    swift_compiler_exe = openFileDialog.getPath()
+    evtobj.clear()
+    evtobj.appendText(swift_compiler_exe)
   }
 }
 
-func OnCompile(_ event: Event) {
+func onCompile(_ event: Event) {
   if String(swift_source.characters.suffix(6)) != ".swift" {
-    _ = wx.MessageDialog(frame, "Select a *.swift file", "Compile", style:wx.OK).ShowModal()
+    _ = wx.MessageDialog(frame, "Select a *.swift file", "Compile", style:wx.OK).showModal()
     return
   }
   let len = swift_source.characters.count
   swift_out_exe = String(swift_source.characters.prefix(len - 6)) + ".exe"
 
-  log_textctrl.Clear()
-  var message : String = "TBD"
-  let compiler_command = "\"" + swift_compiler_exe + "\" \"" + swift_source + "\" -o \"" + swift_out_exe + "\""
+  if !wx.fileExists(swift_compiler_exe) {
+    _ = wx.MessageDialog(frame, "Compiler is not found.\nSet Swift Compiler", "Compile", style:wx.OK).showModal()
+    return
+  }
   
-  let exec_output = wx.ExecuteOutErr(compiler_command)
+  log_textctrl.clear()
+  var message : String = ""
+  var compiler_command = "\"" + swift_compiler_exe + "\" \"" + swift_source + "\" -o \"" + swift_out_exe + "\""
+  if (link_with_subsystem_windows) {
+    compiler_command = compiler_command + " -Xlinker --subsystem -Xlinker windows"
+  }
+  
+  let exec_output = wx.executeOutErr(compiler_command)
   message = compiler_command + "\n"
   if exec_output.characters.count == 0 {
     message += "\n" + "Successfully compiled" + "\n"
@@ -214,27 +299,28 @@ func OnCompile(_ event: Event) {
     message += "\n" + exec_output + "\n"
     message += "\n" + "Compilation Failed" + "\n"
   }
-  log_textctrl.AppendText(message)
+  log_textctrl.appendText(message)
 }
 
-func OnRun(_ event: Event) {
+func onRun(_ event: Event) {
   if String(swift_source.characters.suffix(6)) != ".swift" {
-    _ = wx.MessageDialog(frame, "Select a *.swift file", "Compile", style:wx.OK).ShowModal()
+    _ = wx.MessageDialog(frame, "Select a *.swift file", "Compile", style:wx.OK).showModal()
     return
   }
-  if !wx.FileExists(swift_out_exe) {
-    _ = wx.MessageDialog(frame, "Push Compile button first", "Run", style:wx.OK).ShowModal()
+  if !wx.fileExists(swift_out_exe) {
+    _ = wx.MessageDialog(frame, "Push Compile button first", "Run", style:wx.OK).showModal()
     return
   }
-  log_textctrl.Clear()
+  log_textctrl.clear()
   if run_in_new_window {
-    let run_command = "cmd /C start /wait cmd /K \"" + swift_out_exe + "\""
-    _ = wx.ExecuteOutErr(run_command)
+    let run_command = "cmd /C start /wait cmd /K" + " \"cd C:\\&\"" + swift_out_exe + "\"\""
+    _ = wx.MessageDialog(frame, run_command, "Run", style:wx.OK).showModal()
+    _ = wx.executeOutErr(run_command)
   } else {
     let run_command = "cmd /C \"" + swift_out_exe + "\""
-    let exec_output = wx.ExecuteOutErr(run_command)
+    let exec_output = wx.executeOutErr(run_command)
     let message = exec_output
-    log_textctrl.AppendText(message)
+    log_textctrl.appendText(message)
   }
 }
 
@@ -242,19 +328,19 @@ func OnRun(_ event: Event) {
 // Bindings
 ///////////////////////
 
-select_file_btn.Bind(wx.EVT_BUTTON, OnSelectFile)
-compile_button.Bind(wx.EVT_BUTTON, OnCompile)
-run_button.Bind(wx.EVT_BUTTON, OnRun)
-reset_button.Bind(wx.EVT_BUTTON, OnReset)
-compiler_textctrl.Bind(wx.EVT_LEFT_DCLICK, OnCompilerSettingDblClick)
-news_button.Bind(wx.EVT_BUTTON, OnProjectLatestNews)
-help_button.Bind(wx.EVT_BUTTON, OnHelp)
-project_button.Bind(wx.EVT_BUTTON, OnProjectWebsite)
+select_file_btn.bind(wx.EVT_BUTTON, onSelectFile)
+compile_button.bind(wx.EVT_BUTTON, onCompile)
+run_button.bind(wx.EVT_BUTTON, onRun)
+reset_button.bind(wx.EVT_BUTTON, onReset)
+compiler_textctrl.bind(wx.EVT_LEFT_DCLICK, onCompilerSettingDblClick)
+news_button.bind(wx.EVT_BUTTON, onProjectLatestNews)
+help_button.bind(wx.EVT_BUTTON, onHelp)
+project_button.bind(wx.EVT_BUTTON, onProjectWebsite)
 
        
 ///////////////////////
 // Main Loop
 ///////////////////////
-frame.Show()       
+frame.show()       
 
-app.MainLoop()
+app.mainLoop()
