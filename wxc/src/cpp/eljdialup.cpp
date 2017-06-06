@@ -27,7 +27,7 @@ EWXWEXPORT(int,wxDialUpManager_GetISPNames)(wxDialUpManager* self,void* _lst)
 	if (_lst)
 	{
 		for (unsigned int i = 0; i < arr.GetCount(); i++)
-			((wxChar**)_lst)[i] = wxStrdup(arr.Item(i).c_str());
+			((wxChar**)_lst)[i] = wxStrdup(arr.Item(i).wc_str());
 	}
 
 	return arr.GetCount();

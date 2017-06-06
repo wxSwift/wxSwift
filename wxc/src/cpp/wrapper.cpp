@@ -762,4 +762,41 @@ EWXWEXPORT(int,wxEvent_NewEventType)()
 {
         return (int)wxNewEventType();
 }
+
+EWXWEXPORT(bool, wxc_Initialize)(int argc, wxChar **argv)
+{
+	return wxInitialize(argc, argv);
+}
+
+EWXWEXPORT(bool, wxc_LaunchDefaultBrowser)(wxString* url, int flags)
+{
+	return wxLaunchDefaultBrowser(*url, flags);
+}
+
+EWXWEXPORT(wxString*, wxc_ExecuteOutErr)(wxString* _cmd)
+{
+	wxString *result = new wxString();
+  wxArrayString output, errors;
+
+  wxExecute(*_cmd, output, errors);
+  
+  // Save output, errors to *result
+  int cnt = output.GetCount();
+  for (int i=0; i<cnt; i++) {
+    result->Append(output[i]);
+    result->Append("\n");
+  }
+  cnt = errors.GetCount();
+  for (int i=0; i<cnt; i++) {
+    result->Append(errors[i]);
+    result->Append("\n");
+  }
+  
+	return result;
+}
+
+EWXWEXPORT(bool, wxc_FileExists)(wxString* filename){
+  return wxFileExists(*filename);
+}	
+
 }

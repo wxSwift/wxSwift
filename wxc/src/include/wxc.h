@@ -133,6 +133,8 @@ TClass(wxPoint) wxWindow_ScreenToClient2( TSelf(wxWindow) _obj, TPoint(x,y) );
 
 TClass(wxString) wxString_Create( TString buffer );
 
+TClass(wxString) wxString_CreateUTF8(const char* buffer);
+
 TClass(wxString) wxString_CreateLen( TString buffer, int len );
 
 void             wxString_Delete( TSelf(wxString) s );
@@ -141,6 +143,14 @@ TStringLen       wxString_GetString( TSelf(wxString) s, TStringOut buffer );
 
 size_t           wxString_Length( TSelf(wxString) s );
 
+TClass(wxCharBuffer) wxString_GetUtf8( TSelf(wxString) s);
+
+
+/* wxCharBuffer */
+
+char* wxCharBuffer_DataUtf8( TSelf(wxCharBuffer) cb);
+
+void wxCharBuffer_Delete( TSelf(wxCharBuffer) cb);
 
 
 /* menu */
