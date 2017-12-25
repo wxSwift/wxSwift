@@ -23,7 +23,7 @@ func bridgeTransfer<T : AnyObject>(ptr : VoidPtr) -> T {
     return Unmanaged<T>.fromOpaque(ptr).takeRetainedValue()
 }
 
-class ClosureData : AnyObject {
+class ClosureData {
   var _event_obj : Object
   var _handler : BindCallback
   init(_ event_obj:Object, _ handler: @escaping BindCallback) {
@@ -117,7 +117,7 @@ public class TopLevelWindow : Window {
 }
 
 public class Frame : TopLevelWindow {
-  public init(_ parent: Int?, _ id: Int32, _ title: String, size: Size, style: Int32) {
+  public init(_ parent: Int?, _ id: Int32, _ title: String, size: Size = wx.Size(-1, -1), style: Int32 = DEFAULT_FRAME_STYLE) {
     super.init()
     _obj = _wxc_Frame_Create(nil, id, _wxc_String_CreateUTF8(title), -1, -1, size.width, size.height, DEFAULT_FRAME_STYLE)
   }
