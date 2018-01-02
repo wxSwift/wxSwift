@@ -48,7 +48,7 @@ func GetSlashPositionFromLast(_ arg : String) -> Int {
 
 func getcwd() -> String {
 
-    let cwd = MinGWCrt.getcwd(nil, _MAX_PATH)
+    let cwd = MinGWCrt._getcwd(nil, _MAX_PATH)
     if cwd == nil {
       return ""
     }

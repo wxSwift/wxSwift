@@ -1,10 +1,10 @@
 import wx
 
-_ = _wxInitialize(0, nil);
-_ELJApp_SetExitOnFrameDelete(1);
+_ = _wxc_Initialize(0, nil);
+_wxc_ELJApp_SetExitOnFrameDelete(1);
 
-let frame = _wxFrame_Create(nil, _ID_ANY, _wxString_CreateUTF8("Hello World"), 50, 50, 450, 340, _wxDEFAULT_FRAME_STYLE)
-_ = _wxWindow_Show(frame)
+let frame = _wxc_Frame_Create(nil, ID_ANY, _wxc_String_CreateUTF8("Hello World"), 50, 50, 450, 340, DEFAULT_FRAME_STYLE)
+_ = _wxc_Window_Show(frame)
 
-_ = _ELJApp_MainLoop()
+_ = _wxc_ELJApp_MainLoop()
 

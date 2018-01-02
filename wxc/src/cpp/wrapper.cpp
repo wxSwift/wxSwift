@@ -3,6 +3,7 @@
 #include "wx/dynlib.h"
 #include "wx/fs_zip.h"
 #include "wx/cmdline.h"
+#include <Shlwapi.h>
 
 /* quantize is not supported on wxGTK 2.4.0 */
 #if !defined(__WXGTK__) || (wxVERSION_NUMBER > 2400)
@@ -765,6 +766,23 @@ EWXWEXPORT(int,wxEvent_NewEventType)()
 
 EWXWEXPORT(bool, wxc_Initialize)(int argc, wxChar **argv)
 {
+    // FIXME: Workaround to prevent the segment fault of TestUIFileOpen.swift
+    // When the GetOpenFileNameA() function in the test code is called,
+    // TlsGetValue(SH_WAPI_ThreadRefIndex) in SHGetThreadRef() is called.
+    // When program is loading, `SH_WAPI_ThreadRefIndex = TlsAlloc()` is
+    // called by shcore.dll initializer and SHSetThreadRef() is never called
+    // until GetOpenFileNameA() is called.
+    // The function call for TlsGetValue(SH_WAPI_ThreadRefIndex) succeeds but
+    // returns a gabage value because TlsSetValue(SH_WAPI_ThreadRefIndex,val)
+    // in SHSetThreadRef() is never called.
+    // If the gabage value is zero, then the error handling code works and the
+    // result is OK. If the gabage value is not zero, then the application
+    // crashes because the value is assumed as a COM object and tried to look 
+    // up the AddRef() method through the vtable pointer which is NULL.
+    // We force the TLS value for SH_WAPI_ThreadRefIndex to zero, so the error
+    // handling code prevents the segment fault.
+	SHSetThreadRef(NULL);
+
 	return wxInitialize(argc, argv);
 }
 
