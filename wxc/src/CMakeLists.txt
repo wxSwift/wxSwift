@@ -9,8 +9,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS}")
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS}")
 
 include_directories(
-    "C:/Work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll/mswu"
-    "C:/Work/wxWidgets-3.0.3/include"
+    "${WXWIDGETS_DIR}/lib/gcc510TDM_x64_dll/mswu"
+    "${WXWIDGETS_DIR}/include"
      ${PROJECT_SOURCE_DIR}/include
     )
 

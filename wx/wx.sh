@@ -15,12 +15,10 @@
 # wx.swiftdoc
 # libwx.dll
 
-export SWIFT_BIN=c:/Work/swift_msvc/build/NinjaMinGW/swift/bin
-export WXWIDGETS_INCDIR=/c/work/wxWidgets-3.0.3/include
-export WXWIDGETS_LIBDIR=/c/work/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll
-export WXC_INCDIR=/c/work/wxSwift/wxc/src/include
-export WXC_LIBDIR=/c/work/wxSwift/wxc/build/cpp
-export CCC=/mingw64/bin/clang++
+export WORK_DIR=c:/projects
+export SWIFT_BIN=$WORK_DIR/build/NinjaMinGW/swift/bin
+export WXWIDGETS_LIBDIR=$WORK_DIR/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll
+export CCC=c:/mingw64/bin/clang++
 
 echo "Generating wx.swiftmodule"
 $SWIFT_BIN/swiftc -emit-module wx.swift wx_const.swift wxc_wrapper.swift -module-name wx -module-link-name wx -O -parse-as-library
