@@ -19,14 +19,16 @@ install:
   - pacman -S --noconfirm mingw-w64-x86_64-cmake
   - pacman -S --noconfirm mingw-w64-x86_64-ninja
   - pacman -S --noconfirm mingw-w64-x86_64-clang       
-  - wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-57.1-2-any.pkg.tar.xz
-  - pacman -U --noconfirm mingw-w64-x86_64-icu-57.1-2-any.pkg.tar.xz         
+  - pacman -S --noconfirm mingw-w64-x86_64-icu 
+  #- wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-icu-57.1-2-any.pkg.tar.xz
+  #- pacman -U --noconfirm mingw-w64-x86_64-icu-57.1-2-any.pkg.tar.xz         
   - pacman -S --noconfirm mingw-w64-x86_64-libxml2     
   - pacman -S --noconfirm mingw-w64-x86_64-wineditline 
   - pacman -S --noconfirm mingw-w64-x86_64-winpthreads 
-  - pacman -S --noconfirm mingw-w64-x86_64-pkg-config  
-  - wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-dlfcn-1.0.0-2-any.pkg.tar.xz
-  - pacman -U --noconfirm mingw-w64-x86_64-dlfcn-1.0.0-2-any.pkg.tar.xz         
+  - pacman -S --noconfirm mingw-w64-x86_64-pkg-config
+  - pacman -S --noconfirm mingw-w64-x86_64-dlfcn
+  #- wget -q http://repo.msys2.org/mingw/x86_64/mingw-w64-x86_64-dlfcn-1.0.0-2-any.pkg.tar.xz
+  #- pacman -U --noconfirm mingw-w64-x86_64-dlfcn-1.0.0-2-any.pkg.tar.xz         
   
   # Patch GCC header
   # __float128 is undefined in clang (https://github.com/Alexpux/MINGW-packages/pull/1833)
@@ -34,8 +36,8 @@ install:
   - sed -i "s;defined(_GLIBCXX_USE_FLOAT128)$;defined(_GLIBCXX_USE_FLOAT128) \&\& !defined\(__clang__\);" %MINGW64_DIR%/include/c++/*/bits/std_abs.h
  
   # Download Swift compiler
-  - c:/msys64/usr/bin/mkdir -p %WORK_DIR%/Swift
-  - cd %WORK_DIR%/Swift
+  - MKDIR %WORK_DIR%\Swift
+  - CD %WORK_DIR%/Swift
   - wget -q https://ci.appveyor.com/api/projects/tinysun212/swift-compiler-builder/artifacts/swift.zip
   - 7z x swift.zip
   - cp -p usr/bin/swift.exe usr/bin/swiftc.exe
@@ -44,14 +46,14 @@ install:
   - MKLINK /d mingw64 c:\msys64\mingw64
   
   # Download Foundation module
-  - cd %WORK_DIR%/Swift
+  - CD %WORK_DIR%/Swift
   - wget -q https://ci.appveyor.com/api/projects/tinysun212/swift-foundation-builder/artifacts/swift_foundation.zip
   - 7z x swift_foundation.zip
   
   # Download wxWidgets 3.0.3
-  - cd %WORK_DIR%
+  - CD %WORK_DIR%
   - MKDIR wxWidgets-3.0.3
-  - cd wxWidgets-3.0.3
+  - CD wxWidgets-3.0.3
   - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxMSW-3.0.3_gcc510TDM_x64_Dev.7z
   - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3-headers.7z
   - 7z x wxMSW-3.0.3_gcc510TDM_x64_Dev.7z
@@ -59,14 +61,14 @@ install:
  
 build_script:
   # Build wxc library
-  - cd %WORK_DIR%/wxSwift/wxc
+  - CD %WORK_DIR%/wxSwift/wxc
   - MKDIR build
-  - cd build
+  - CD build
   - cmake -G Ninja -DWXWIDGETS_DIR=%WORK_DIR%/wxWidgets-3.0.3 ../src
   - ninja
   
   # Build wx module
-  - cd %WORK_DIR%/wxSwift/wx
+  - CD %WORK_DIR%/wxSwift/wx
   # Generating wx.swiftmodule
   - swiftc -emit-module wx.swift wx_const.swift wxc_wrapper.swift -module-name wx -module-link-name wx -O -parse-as-library
   # Compiling wx.swift
@@ -83,7 +85,7 @@ build_script:
     -lwxscintilla -lwxtiff -lwxzlib -lShlwapi -Xlinker --allow-multiple-definition
   
 after_build:
-  - cd %WORK_DIR%/wxSwift/wx
+  - CD %WORK_DIR%/wxSwift/wx
   - MKDIR usr\bin
   - MKDIR usr\lib\swift\mingw\x86_64
   - cp -p wx.swiftmodule wx.swiftdoc libwx.dll.a usr\lib\swift\mingw\x86_64
@@ -93,7 +95,7 @@ after_build:
   - mv wxswift.zip %APPVEYOR_BUILD_FOLDER%
 
 test_script:
-  - 'echo skip test'
+  - ECHO skip test
   
 artifacts:
   - path: wxswift.zip
