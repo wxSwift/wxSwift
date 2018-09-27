@@ -1,8 +1,8 @@
 
-public typealias VoidPtr = UnsafeMutableRawPointer!
-public typealias WCharPtrPtr = UnsafeMutablePointer<UnsafeMutablePointer<UInt16>?>!
-public typealias ConstCharPtr = UnsafePointer<Int8>!
-public typealias CharPtr = UnsafeMutablePointer<Int8>!
+public typealias VoidPtr = UnsafeMutableRawPointer?
+public typealias WCharPtrPtr = UnsafeMutablePointer<UnsafeMutablePointer<UInt16>?>?
+public typealias ConstCharPtr = UnsafePointer<Int8>?
+public typealias CharPtr = UnsafeMutablePointer<Int8>?
 
 // typedef void (*ClosureFun)( void* _fun, void* _data, void* _evt );
 public typealias ClosureFun = @convention(c) (VoidPtr, VoidPtr, VoidPtr) -> Void

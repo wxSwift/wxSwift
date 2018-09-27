@@ -16,6 +16,9 @@ public var MAXIMIZE_BOX: Int32 = 0x0200
 public var TINY_CAPTION: Int32 = 0x0080  // clashes with wxNO_DEFAULT
 public var RESIZE_BORDER: Int32 = 0x0040  // == wxCLOSE
 
+// frame
+public var FRAME_FLOAT_ON_PARENT : Int32 = 0x00000008
+
 // style
 public var BORDER_DEFAULT: Int32 = 0
 public var BORDER_NONE   : Int32 = 0x00200000
