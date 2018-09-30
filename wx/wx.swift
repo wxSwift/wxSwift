@@ -12,7 +12,7 @@ func bridge<T : AnyObject>(obj : T) -> VoidPtr {
 }
 
 func bridge<T : AnyObject>(ptr : VoidPtr) -> T {
-    return Unmanaged<T>.fromOpaque(ptr).takeUnretainedValue()
+    return Unmanaged<T>.fromOpaque(ptr!).takeUnretainedValue()
 }
 
 func bridgeRetained<T : AnyObject>(obj : T) -> VoidPtr {
@@ -20,7 +20,7 @@ func bridgeRetained<T : AnyObject>(obj : T) -> VoidPtr {
 }
 
 func bridgeTransfer<T : AnyObject>(ptr : VoidPtr) -> T {
-    return Unmanaged<T>.fromOpaque(ptr).takeRetainedValue()
+    return Unmanaged<T>.fromOpaque(ptr!).takeRetainedValue()
 }
 
 class ClosureData {
@@ -119,7 +119,7 @@ public class TopLevelWindow : Window {
 public class Frame : TopLevelWindow {
   public init(_ parent: Int?, _ id: Int32, _ title: String, size: Size = wx.Size(-1, -1), style: Int32 = DEFAULT_FRAME_STYLE) {
     super.init()
-    _obj = _wxc_Frame_Create(nil, id, _wxc_String_CreateUTF8(title), -1, -1, size.width, size.height, DEFAULT_FRAME_STYLE)
+    _obj = _wxc_Frame_Create(nil, id, _wxc_String_CreateUTF8(title), -1, -1, size.width, size.height, style)
   }
 }
 
@@ -200,7 +200,7 @@ public class FileDialog : Dialog {
   public func getPath() -> String {
     let wx_string = _wxc_FileDialog_GetPath(_obj)
     let utf8_char_buf = _wxc_wxString_GetUtf8(wx_string)
-    let ret = String(cString: _wxc_wxCharBuffer_DataUtf8(utf8_char_buf))
+    let ret = String(cString: _wxc_wxCharBuffer_DataUtf8(utf8_char_buf)!)
     _wxc_wxCharBuffer_Delete(utf8_char_buf)
     return ret
   }
@@ -289,7 +289,7 @@ public func execute(_ command: String, _ flags: Int32, _ callback: VoidPtr) -> I
 public func executeOutErr(_ command: String) -> String {
   let wx_string = _wxc_ExecuteOutErr(_wxc_String_CreateUTF8(command));
   let utf8_char_buf = _wxc_wxString_GetUtf8(wx_string)
-  let ret = String(cString: _wxc_wxCharBuffer_DataUtf8(utf8_char_buf))
+  let ret = String(cString: _wxc_wxCharBuffer_DataUtf8(utf8_char_buf)!)
   _wxc_wxCharBuffer_Delete(utf8_char_buf)
   return ret
 }
