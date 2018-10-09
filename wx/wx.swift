@@ -104,6 +104,10 @@ open class Window : EvtHandler {
   public func setWindowStyleFlag(_ style: Int32) {
     _wxc_Window_SetWindowStyleFlag(_obj, style)
   }
+
+  public func setLabel(_ title: String) {
+    _wxc_Window_SetLabel(_obj, _wxc_String_CreateUTF8(title))
+  }
 }
 
 public class TopLevelWindow : Window {

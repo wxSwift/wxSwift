@@ -50,21 +50,21 @@ install:
   - wget -q https://ci.appveyor.com/api/projects/tinysun212/swift-foundation-builder/artifacts/swift_foundation.zip
   - 7z x swift_foundation.zip
   
-  # Download wxWidgets 3.0.3
+  # Download wxWidgets 3.0.4
   - CD %WORK_DIR%
-  - MKDIR wxWidgets-3.0.3
-  - CD wxWidgets-3.0.3
-  - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxMSW-3.0.3_gcc510TDM_x64_Dev.7z
-  - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.3/wxWidgets-3.0.3-headers.7z
-  - 7z x wxMSW-3.0.3_gcc510TDM_x64_Dev.7z
-  - 7z x wxWidgets-3.0.3-headers.7z
+  - MKDIR wxWidgets-3.0.4
+  - CD wxWidgets-3.0.4
+  - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.4/wxMSW-3.0.4_gcc720_x64_Dev.7z
+  - wget -q https://github.com/wxWidgets/wxWidgets/releases/download/v3.0.4/wxWidgets-3.0.4-headers.7z
+  - 7z x wxMSW-3.0.4_gcc720_x64_Dev.7z
+  - 7z x wxWidgets-3.0.4-headers.7z
  
 build_script:
   # Build wxc library
   - CD %WORK_DIR%/wxSwift/wxc
   - MKDIR build
   - CD build
-  - cmake -G Ninja -DWXWIDGETS_DIR=%WORK_DIR%/wxWidgets-3.0.3 ../src
+  - cmake -G Ninja -DWXWIDGETS_DIR=%WORK_DIR%/wxWidgets-3.0.4 ../src
   - ninja
   
   # Build wx module
@@ -76,7 +76,7 @@ build_script:
   # Compiling wxwidgets_patch.cpp
   - clang++ -c wxwidgets_patch.cpp
   # Building libwx.dll
-  - SET WXWIDGETS_LIBDIR=%WORK_DIR%/wxWidgets-3.0.3/lib/gcc510TDM_x64_dll
+  - SET WXWIDGETS_LIBDIR=%WORK_DIR%/wxWidgets-3.0.4/lib/gcc720_x64_dll
   - clang++ -shared -o libwx.dll wx.o wxwidgets_patch.o -L%WORK_DIR%/Swift/usr/lib/swift/mingw -lswiftCore 
     -L %WORK_DIR%/wxSwift/wxc/build/cpp -lwxC -Wl,--out-implib,libwx.dll.a  
     -L %WXWIDGETS_LIBDIR% -lwxbase30u -lwxbase30u_net -lwxbase30u_xml -lwxexpat -lwxjpeg -lwxmsw30u_adv 

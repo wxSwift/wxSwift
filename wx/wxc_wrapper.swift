@@ -196,6 +196,13 @@ public func _wxc_Window_SetForegroundColour(_ _obj: VoidPtr, _ colour: VoidPtr) 
   return wxWindow_SetForegroundColour(_obj, colour)
 }
 
+// void       wxWindow_SetLabel( TSelf(wxWindow) _obj, TClass(wxString) _title );
+@_silgen_name("wxWindow_SetLabel")
+fileprivate func wxWindow_SetLabel(_ _obj: VoidPtr, _ _title: VoidPtr) -> Void
+public func _wxc_Window_SetLabel(_ _obj: VoidPtr, _ _title: VoidPtr) -> Void {
+  return wxWindow_SetLabel(_obj, _title)
+}
+
 // TClass(wxFileDialog) wxFileDialog_Create( TClass(wxWindow) _prt, TClass(wxString) _msg, TClass(wxString) _dir, TClass(wxString) _fle, TClass(wxString) _wcd, TPoint(_lft,_top), int _stl );
 @_silgen_name("wxFileDialog_Create")
 fileprivate func wxFileDialog_Create(_ _prt: VoidPtr, _ _msg: VoidPtr, _ _dir: VoidPtr, _ _fle: VoidPtr, _ _wcd: VoidPtr, _ _lft: Int32, _ _top: Int32, _ _stl: Int32) -> VoidPtr
